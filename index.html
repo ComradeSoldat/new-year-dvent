@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новогодний Адвент Календарь</title>
+	<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 	viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎄</text></svg>">
+
+    <!-- Подключаем праздничный шрифт с поддержкой кириллицы (Caveat) -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #b3000c; /* Глубокий красный */
+            --door-color: #1a472a; /* Еловый зеленый */
+            --door-hover: #2d6642;
+            --text-gold: #f8d568;
+            --snow-color: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            /* Отступ для body, чтобы баннер не перекрывал нижние карточки */
+            padding-bottom: 100px; 
+            background-color: var(--bg-color);
+            /* Простой паттерн снежинок на фоне */
+            background-image: 
+                radial-gradient(var(--snow-color) 1px, transparent 1px),
+                radial-gradient(var(--snow-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            font-family: 'Caveat', cursive;
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* 1. Место для картинки сверху */
+         .header-placeholder {
+            width: 40%;
+            height: 200px;
+            margin: 0 auto;
+            display: flex;       /* Это важно для выравнивания */
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            
+            /* Новые свойства для ссылки: */
+            text-decoration: none; /* Убираем подчеркивание */
+            cursor: pointer;       /* Курсор в виде руки */
+            transition: transform 0.3s; /* Плавная анимация нажатия */
+        }
+
+        /* Эффект при наведении на шапку */
+        .header-placeholder:hover {
+            transform: scale(1.02); /* Чуть увеличивается */
+            box-shadow: 0 0 15px var(--text-gold); /* Свечение */
+        }
+
+        .header-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block; /* ОБЯЗАТЕЛЬНО: делаем картинку видимой */
+        }
+
+        /* Основной контейнер */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 2. Сетка для 31 элемента */
+        .calendar-grid {
+            display: grid;
+            /* Адаптивные колонки: минимум 150px шириной */
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        /* Карточка дня */
+        .day-card {
+            aspect-ratio: 9 / 16; /* Вертикальный формат */
+            position: relative;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            overflow: hidden;
+            background: #fff;
+            border: 2px solid var(--text-gold);
+            transition: transform 0.2s;
+        }
+
+        .day-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px var(--text-gold);
+        }
+
+        /* "Дверка" с номером */
+        .door {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--door-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: var(--text-gold);
+            z-index: 2;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            
+            /* Декоративная рамка внутри дверки */
+            border: 4px dotted var(--text-gold);
+            box-sizing: border-box;
+        }
+
+        /* Контент (GIF) */
+        .gif-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        .gif-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Состояние "Открыто" */
+        .day-card.open .door {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.1);
+        }
+
+        /* Дополнительный декор: ленточка на закрытой дверке */
+        .door::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            background: rgba(255,215,0, 0.3);
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .door::after {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 10px;
+            background: rgba(255,215,0, 0.3);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* --- КНОПКИ УПРАВЛЕНИЯ --- */
+
+        /* Общий стиль для круглых кнопок */
+        .control-btn {
+            position: fixed;
+            bottom: 100px; /* Отступ снизу (над баннером) */
+            z-index: 999;
+            border: none;
+            outline: none;
+            background-color: var(--text-gold); 
+            color: var(--bg-color); 
+            cursor: pointer;
+            padding: 12px 0; /* Высоту задаем паддингом, ширину фиксируем для круга */
+            width: 50px;
+            height: 50px;
+            border-radius: 50%; 
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: background-color 0.3s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background-color: #fff; 
+            transform: scale(1.1); 
+            color: var(--door-color);
+        }
+
+        /* Кнопка "Наверх" - справа */
+        #myBtn {
+            display: none; /* Скрыта по умолчанию, пока не скроллим */
+            right: 20px;
+        }
+
+        /* Кнопка "Сброс" - слева */
+        #resetBtn {
+            left: 20px;
+        }
+
+        /* Стиль самого баннера */
+        .bottom-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--door-color); /* Еловый зеленый */
+            border-top: 4px solid var(--text-gold);
+            padding: 15px 0;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+            z-index: 1000; /* Поверх всего */
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bottom-banner:hover {
+            background-color: var(--door-hover);
+            transform: translateY(-2px);
+        }
+
+        .banner-text {
+            color: var(--text-gold);
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(248, 213, 104, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+    <a href="https://t.me/+liNEgkZcCx04ZjEy"
+       class="header-placeholder"
+       id="headerArea"
+       target="_blank">
+        <img src="https://i.postimg.cc/bwzP85MQ/Bez-imeni-4.png" alt="Новогодний баннер">
+    </a>
+</header>
+
+    <main>
+        <div class="calendar-grid" id="grid">
+            <!-- Окошки будут сгенерированы JavaScript -->
+        </div>
+    </main>
+
+    <!-- 1. Элементы интерфейса -->
+    
+    <!-- Ссылка на ваш канал -->
+    <a href="https://t.me/+liNEgkZcCx04ZjEy" class="bottom-banner" target="_blank">
+        <span class="banner-text">🎄 Перейти в Нейроубежище 34 🎄</span>
+    </a>
+    
+    <!-- Кнопка наверх (справа) -->
+    <button onclick="topFunction()" id="myBtn" class="control-btn" title="Наверх">⬆</button>
+
+    <!-- Кнопка сброса (слева) -->
+    <button onclick="resetCalendar()" id="resetBtn" class="control-btn" title="Закрыть все подарки">↺</button>
+
+
+    <!-- 2. Скрипт (внизу, чтобы элементы уже существовали) -->
+    <script>
+        // КОНФИГУРАЦИЯ
+        const gifLinks = [
+            "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGZsazRjc3Q5MTIyZG94dWo4OHNnazkwN3p1NjhhaW1sbmJhZzQ3YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/M01rNV2oO06BQpfsBB/giphy.gif",
+            "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjA4N3EzeWRkbGU4ajRpanp5dWU4cWUzb204ZGdmMHE0YW0xZjgzbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/s4NSsxgLaRBXirehag/giphy.gif",
+            "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYTVzbHhnb3AxMW12ZGVvd3VxMWR6b2RsODFxYjR0aGZyNHNka3kzNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/nsQW9QRc25eUL47MTT/giphy.gif",
+
+"https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDRzbzBvdm8wYXBmbXRqNjhpajBiZDgwbTF1ZTk3N2Q4MmZzaGhzaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/sOV0Z9MvHn3QJa3Dvp/giphy.gif",
+
+"https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2U0d2F5YzYweHB1NDJ1MTM3bnJ1bmcxbDlxcWpwanB2Z25ja3hncSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/tR3Y6sz04X6fwxCFOv/giphy.gif",
+
+"https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3hiMWR2Y3kwd2t0ZXBzODRzaGdoMDd2Ym5vd3ZmYmlycHZsaTMxMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/yPjWmlnrOoVuOgDWoE/giphy.gif",
+
+"https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmVyaGJjYmF1aWMydnF0YW04aTExem8xbGg1NnNnbjgzOXd6dTh3eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/B7l1wYJrYFhLz6gVfL/giphy.gif",
+
+"https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjkwMjJlZmg5dWxra3N2cTRzZndkbm9yb3cycGUzdzJmbjdlbzU3NiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/B1BWTka4aAmzchOF4x/giphy.gif",
+
+"https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExMzZvdHFqYnppZWxjdGNld3l0cGw3bHdiZ3E4MGE0MmttYmpwbXUxZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/AzoLyMxJnHwuFnIzzo/giphy.gif",
+
+"https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWFwOWFiMjV4OWMzZGI4dTk5aHQ3bjVycDc4NHFzb3l4Zzg2dXdycSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ztoXHLIXhfHBNCTx3e/giphy.gif",
+
+"https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZHQ2Y2loMzdudW44cWNtYndrdnM4ODhqbmVrcGFzY3NtMDdjc2FhZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/U4XcHTLOQ9QlfqmLoH/giphy.gif",
+
+"https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExazZ2cGQ1eWtsb2U5NnIzanJodjYwamUwOG5qYXp0bXI3bHdjdXFyaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/zbMQpsnFuhOIcT9FSL/giphy.gif",
+
+"https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzFtOXR1ZmJkbnA1cHVpN21qNGRvb24ya2NjM29jMXl4dHhtOG9ybSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ERi3dG6dyRukYjHKKJ/giphy.gif",
+
+"https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzBtMjN5ZG5xNmtvaXlhMm54ZHVxdTJsMTlzcjA0Z2o2bjRnMHdlMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ziAigoeHx4mCtuH8Y/giphy.gif",
+
+"https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2J5M3MzbmZlenVvOG9qNG45eHlpNDJkdXJncDc2bTN0NHJ1cmRuZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Mww1rtBUEK5bIeF9NV/giphy.gif",
+
+"https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWl3OGV6ZXNmMHY0enk1NnpxODJnbjB6MnFodWo0azBlODBjY2xoayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/f6dRD3oPvCwsbgUfkT/giphy.gif",
+
+"https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2J4OG9ueHNmMmk0c2N5Znh3bzB0c3Jzbnp4aGpyaGtvcGxwdmRvYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/yVpWrZm6s3SkSJ2rVI/giphy.gif",
+
+"https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExcjlpcm80bzUybjVpaDhiMTM5MWxmM2RmcHF4YXk4eTBnczlkNHVrcyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/tr8qPglqgYKhZkUmnO/giphy.gif",
+
+"https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbWQ1aGVpZndhdjl2Y3F5YXU4cjZvNHVwcHpucWt5c2locHprZWx2OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ExcOCFF1mNcs7xybxe/giphy.gif",
+
+"https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZHJldmw5ejM1N2piZzRocmFkNmZ3YjJlNHdpY2N4MWhydXJqem9rbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/iNbv1AEXoR9LTnXEpm/giphy.gif",
+
+"https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDMyODFxaTZ2OWJzZzJxdTRhOTdoeDB1NWg4YTRuaDVvaGZpNDdpZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/iVKDfvBoouYEikiPiA/giphy.gif",
+
+"https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnl3aWxmdzhqZzljenZwYzRjZmR0bjJwOGd1NjY4Y2FmYTBlZ2FuYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/N6NBTI3wnVy2A2ktoe/giphy.gif",
+
+"https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZTQyMnNxd3VzenBkN2RqcW5udTNmZzhrM29nNmZrcXo2ZTBhb21mciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/NJAgEpiwjXJTWoGYzo/giphy.gif",
+
+"https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU0NDg5eXJqcHJhaGc1eXB6N2hzaWgxdjhhNnFrOWRmdmZ6bm5weSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3h1m0rsEyAl5EvNN9e/giphy.gif",
+
+"https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmxwMjd6ZnluM2FjMmhkaWZlc2Z4bzd0bmo5MGwzOTE3c2lkMjQ1eiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/T2tZfpLngeFnGAjNpd/giphy.gif",
+
+"https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNmYzaTdwdmx6ZnJzeTBvNmN6OHhqMXlzaWt5ZmNxYTBmbTR0aXhrNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wOWd3SdgtRu4Mi15M5/giphy.gif",
+
+"https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2pmMWo5dnVleHlrN2JydTRyZDQ5ZDR0ZGM4ajlyeDZmY2w0bWFjNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/2PvoFCg4bCG03c58XA/giphy.gif",
+
+"https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWN4dXZ4ajFhajV4aXk1YmZqNW1lazdrcHF0czk2ZGs2aGg5cmk0OCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/vIy1Mf8q1VE1hyA17D/giphy.gif",
+
+"https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNmJidDZ3dHQ0Y3p2aWt3ZTRwa3k0OW1rY2R2YXBjbXJ1aHpuMHVzYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/axxoJLrkFXwFPLiYgB/giphy.gif",
+
+"https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2dqaXdmY3NkOTcwMDhvamcxMjJ1MHFlZWh1azM3b3phbW9hNGVrdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/silRJFGBJaRD6Tj0i9/giphy.gif",
+
+"https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHUzbHd5dHlzMDEyNDlwc2d6dDJjbmQ1OXp0dDBjZWF2ZGZudTF1MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4gT5NuISr0CCASRrc0/giphy.gif",
+
+            // ... добавьте свои ссылки сюда до 31 ...
+        ];
+
+        const placeholderGif = "https://media.giphy.com/media/26tozAvF9z6XN8SX6/giphy.gif";
+        const gridContainer = document.getElementById('grid');
+
+        // Генерация 31 окошка
+        for (let i = 1; i <= 31; i++) {
+            const card = document.createElement('div');
+            card.className = 'day-card';
+            const gifSrc = gifLinks[i-1] ? gifLinks[i-1] : placeholderGif;
+
+            card.innerHTML = `
+                <div class="door">${i}</div>
+                <div class="gif-content">
+                    <img src="${gifSrc}" alt="Day ${i}">
+                </div>
+            `;
+
+            card.addEventListener('click', function() {
+                this.classList.add('open');
+            });
+            gridContainer.appendChild(card);
+        }
+
+        // --- ЛОГИКА КНОПКИ НАВЕРХ ---
+        let mybutton = document.getElementById("myBtn");
+
+        window.onscroll = function() {scrollFunction()};
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                mybutton.style.display = "flex"; // Используем flex, чтобы центрировать стрелку
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        function topFunction() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // --- ЛОГИКА КНОПКИ СБРОСА ---
+        function resetCalendar() {
+            // Находим все открытые карточки
+            const openCards = document.querySelectorAll('.day-card.open');
+            
+            // Проходим по каждой и убираем класс 'open'
+            openCards.forEach(card => {
+                card.classList.remove('open');
+            });
+
+            // Опционально: прокручиваем наверх при сбросе
+            // topFunction(); 
+        }
+    </script>
+</body>
+</html>
