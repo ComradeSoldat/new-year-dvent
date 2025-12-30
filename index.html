@@ -6,7 +6,6 @@
     <title>Новогодний Адвент Календарь</title>
 	<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 	viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎄</text></svg>">
 
-    <!-- Подключаем праздничный шрифт с поддержкой кириллицы (Caveat) -->
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -20,10 +19,10 @@
         body {
             margin: 0;
             padding: 0;
-            /* Отступ для body, чтобы баннер не перекрывал нижние карточки */
+
             padding-bottom: 100px; 
             background-color: var(--bg-color);
-            /* Простой паттерн снежинок на фоне */
+
             background-image: 
                 radial-gradient(var(--snow-color) 1px, transparent 1px),
                 radial-gradient(var(--snow-color) 1px, transparent 1px);
@@ -34,52 +33,50 @@
             min-height: 100vh;
         }
 
-        /* 1. Место для картинки сверху */
          .header-placeholder {
             width: 40%;
             margin: 0 auto;
-            display: block;       /* Это важно для выравнивания */
+            display: block;       
             align-items: center;
             justify-content: center;
             overflow: hidden;
             
-            /* Новые свойства для ссылки: */
-            text-decoration: none; /* Убираем подчеркивание */
-            cursor: pointer;       /* Курсор в виде руки */
-            transition: transform 0.3s; /* Плавная анимация нажатия */
+            text-decoration: none; 
+            cursor: pointer;       
+            transition: transform 0.3s; 
         }
 
-        /* Эффект при наведении на шапку */
+       
         .header-placeholder:hover {
-            transform: scale(1.02); /* Чуть увеличивается */
-            box-shadow: 0 0 15px var(--text-gold); /* Свечение */
+            transform: scale(1.02); 
+            box-shadow: 0 0 15px var(--text-gold); 
         }
 
         .header-placeholder img {
             width: 100%;
             height: auto;
             object-fit: contain;
-            display: block; /* ОБЯЗАТЕЛЬНО: делаем картинку видимой */
+            display: block; 
         }
 
-        /* Основной контейнер */
+       
         main {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        /* 2. Сетка для 31 элемента */
+        
         .calendar-grid {
             display: grid;
-            /* Адаптивные колонки: минимум 150px шириной */
+            
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
         }
 
-        /* Карточка дня */
+        
         .day-card {
-            aspect-ratio: 9 / 16; /* Вертикальный формат */
+            aspect-ratio: 9 / 16; 
             position: relative;
             cursor: pointer;
             border-radius: 10px;
@@ -95,7 +92,7 @@
             box-shadow: 0 0 15px var(--text-gold);
         }
 
-        /* "Дверка" с номером */
+        
         .door {
             position: absolute;
             top: 0;
@@ -111,12 +108,12 @@
             z-index: 2;
             transition: opacity 0.6s ease, transform 0.6s ease;
             
-            /* Декоративная рамка внутри дверки */
+            
             border: 4px dotted var(--text-gold);
             box-sizing: border-box;
         }
 
-        /* Контент (GIF) */
+        
         .gif-content {
             position: absolute;
             top: 0;
@@ -136,14 +133,14 @@
             object-fit: cover;
         }
 
-        /* Состояние "Открыто" */
+        
         .day-card.open .door {
             opacity: 0;
             pointer-events: none;
             transform: scale(1.1);
         }
 
-        /* Дополнительный декор: ленточка на закрытой дверке */
+        
         .door::before {
             content: '';
             position: absolute;
@@ -163,19 +160,17 @@
             transform: translateX(-50%);
         }
 
-        /* --- КНОПКИ УПРАВЛЕНИЯ --- */
-
-        /* Общий стиль для круглых кнопок */
+        
         .control-btn {
             position: fixed;
-            bottom: 100px; /* Отступ снизу (над баннером) */
+            bottom: 100px; 
             z-index: 999;
             border: none;
             outline: none;
             background-color: var(--text-gold); 
             color: var(--bg-color); 
             cursor: pointer;
-            padding: 12px 0; /* Высоту задаем паддингом, ширину фиксируем для круга */
+            padding: 12px 0; 
             width: 50px;
             height: 50px;
             border-radius: 50%; 
@@ -193,24 +188,24 @@
             color: var(--door-color);
         }
 
-        /* Кнопка "Наверх" - справа */
+        
         #myBtn {
-            display: none; /* Скрыта по умолчанию, пока не скроллим */
+            display: none; 
             right: 20px;
         }
 
-        /* Кнопка "Сброс" - слева */
+        
         #resetBtn {
             left: 20px;
         }
 
-        /* Стиль самого баннера */
+        
         .bottom-banner {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background-color: var(--door-color); /* Еловый зеленый */
+            background-color: var(--door-color); 
             border-top: 4px solid var(--text-gold);
             padding: 15px 0;
             text-align: center;
@@ -251,27 +246,25 @@
 
     <main>
         <div class="calendar-grid" id="grid">
-            <!-- Окошки будут сгенерированы JavaScript -->
+            
         </div>
     </main>
 
-    <!-- 1. Элементы интерфейса -->
     
-    <!-- Ссылка на ваш канал -->
     <a href="https://t.me/+liNEgkZcCx04ZjEy" class="bottom-banner" target="_blank">
         <span class="banner-text">🎄 Перейти в Нейроубежище 34 🎄</span>
     </a>
     
-    <!-- Кнопка наверх (справа) -->
+    
     <button onclick="topFunction()" id="myBtn" class="control-btn" title="Наверх">⬆</button>
 
-    <!-- Кнопка сброса (слева) -->
+   
     <button onclick="resetCalendar()" id="resetBtn" class="control-btn" title="Закрыть все подарки">↺</button>
 
 
-    <!-- 2. Скрипт (внизу, чтобы элементы уже существовали) -->
+    
     <script>
-        // КОНФИГУРАЦИЯ
+        
         const gifLinks = [
             "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGZsazRjc3Q5MTIyZG94dWo4OHNnazkwN3p1NjhhaW1sbmJhZzQ3YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/M01rNV2oO06BQpfsBB/giphy.gif",
             "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjA4N3EzeWRkbGU4ajRpanp5dWU4cWUzb204ZGdmMHE0YW0xZjgzbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/s4NSsxgLaRBXirehag/giphy.gif",
@@ -333,13 +326,13 @@
 
 "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHUzbHd5dHlzMDEyNDlwc2d6dDJjbmQ1OXp0dDBjZWF2ZGZudTF1MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4gT5NuISr0CCASRrc0/giphy.gif",
 
-            // ... добавьте свои ссылки сюда до 31 ...
+            
         ];
 
         const placeholderGif = "https://media.giphy.com/media/26tozAvF9z6XN8SX6/giphy.gif";
         const gridContainer = document.getElementById('grid');
 
-        // Генерация 31 окошка
+        
         for (let i = 1; i <= 31; i++) {
             const card = document.createElement('div');
             card.className = 'day-card';
@@ -358,14 +351,14 @@
             gridContainer.appendChild(card);
         }
 
-        // --- ЛОГИКА КНОПКИ НАВЕРХ ---
+        
         let mybutton = document.getElementById("myBtn");
 
         window.onscroll = function() {scrollFunction()};
 
         function scrollFunction() {
             if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-                mybutton.style.display = "flex"; // Используем flex, чтобы центрировать стрелку
+                mybutton.style.display = "flex"; /
             } else {
                 mybutton.style.display = "none";
             }
@@ -375,19 +368,19 @@
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        // --- ЛОГИКА КНОПКИ СБРОСА ---
+        
         function resetCalendar() {
-            // Находим все открытые карточки
+            
             const openCards = document.querySelectorAll('.day-card.open');
             
-            // Проходим по каждой и убираем класс 'open'
+            
             openCards.forEach(card => {
                 card.classList.remove('open');
             });
 
-            // Опционально: прокручиваем наверх при сбросе
-            // topFunction(); 
+            topFunction(); 
         }
     </script>
 </body>
 </html>
+
